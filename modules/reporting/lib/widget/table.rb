@@ -28,12 +28,18 @@
 
 class Widget::Table < Widget::Base
   extend Report::InheritedAttribute
+  include OpTurbo::Streamable
   include ReportingHelper
+
+  delegate :cost_type, :unit_id, to: :controller
 
   attr_accessor :fields, :mapping
 
-  def initialize(query)
-    raise ArgumentError, "Tables only work on CostQuery!" unless query.is_a? CostQuery
+  def initialize(subject, **options)
+    raise ArgumentError, "Tables only work on CostQuery!" unless subject.is_a? CostQuery
+
+    @subject = subject
+    @options = options
 
     super
   end
@@ -46,15 +52,17 @@ class Widget::Table < Widget::Base
     end
   end
 
-  def render
-    write("<!-- table start -->".html_safe)
-    if @subject.result.count <= 0
-      write(content_tag(:div, "", class: "generic-table--no-results-container") do
-        content_tag(:i, "", class: "icon-info1") +
-          content_tag(:span, I18n.t(:no_results_title_text), class: "generic-table--no-results-title")
-      end)
-    else
-      render_widget(resolve_table, @subject, @options.reverse_merge(to: @output))
+  def call
+    component_wrapper(tag: "turbo-frame") do
+      # concat("<!-- table start -->".html_safe)
+      if @subject.result.count <= 0
+        content_tag(:div, "", class: "generic-table--no-results-container") do
+          content_tag(:i, "", class: "icon-info1") +
+            content_tag(:span, I18n.t(:no_results_title_text), class: "generic-table--no-results-title")
+        end
+      else
+        render_widget(resolve_table, @subject, **@options)
+      end
     end
   end
 end

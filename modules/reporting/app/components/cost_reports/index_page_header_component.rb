@@ -31,7 +31,6 @@
 module CostReports
   class IndexPageHeaderComponent < ApplicationComponent
     include ApplicationHelper
-    include Widget::ReportingWidget::RenderWidgetInstanceMethods
 
     def initialize(query:, project: nil)
       super

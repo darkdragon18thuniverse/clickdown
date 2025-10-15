@@ -40,6 +40,8 @@ class CostReportsController < ApplicationController
 
   Widget::Base.dont_cache!
 
+  include OpTurbo::ComponentStream
+
   before_action :check_cache
   before_action :load_all
   before_action :load_and_authorize_in_optional_project
@@ -76,11 +78,12 @@ class CostReportsController < ApplicationController
   end
 
   def index
-    table
-    return if performed?
-
     respond_to do |format|
       format.html { render_html }
+      format.turbo_stream do
+        update_via_turbo_stream(component: Widget::Table.new(@query))
+        render turbo_stream: turbo_streams
+      end
       format.xls { export(:xls) }
       format.pdf { export(:pdf) }
     end
@@ -112,14 +115,6 @@ class CostReportsController < ApplicationController
     end
   end
 
-  ##
-  # Render the report. Renders either the complete index or the table only
-  def table
-    if set_filter? && request.xhr?
-      self.response_body = render_widget(Widget::Table, @query)
-    end
-  end
-
   current_menu_item [:index, :show] do |controller|
     controller.menu_item_to_highlight_on_index
   end
@@ -134,8 +129,12 @@ class CostReportsController < ApplicationController
   def show
     if @query
       store_query
-      table
-      render action: "index", locals: { menu_name: project_or_global_menu } unless performed?
+
+      respond_to do |format|
+        format.html do
+          render action: "index", locals: { menu_name: project_or_global_menu }
+        end
+      end
     else
       raise ActiveRecord::RecordNotFound
     end
@@ -144,7 +143,8 @@ class CostReportsController < ApplicationController
   ##
   # Create a new saved query. Returns the redirect url to an XHR or redirects directly
   def create
-    @query.name = params[:query_name].presence || ::I18n.t(:label_default)
+    expected_params = params.expect(query: %i[name is_public])
+    @query.name = expected_params[:name] || ::I18n.t(:label_default)
     @query.public! if make_query_public?
     @query.send(:"#{user_key}=", current_user.id)
     @query.save!
@@ -152,11 +152,8 @@ class CostReportsController < ApplicationController
     redirect_params = { action: "show", id: @query.id }
     redirect_params[:project_id] = @project.identifier if @project
 
-    if request.xhr? # Update via AJAX - return url for redirect
-      render plain: url_for(**redirect_params)
-    else # Redirect to the new record
-      redirect_to **redirect_params
-    end
+    # Redirect to the new record
+    redirect_to(**redirect_params, status: :see_other)
   end
 
   ##
@@ -174,10 +171,16 @@ class CostReportsController < ApplicationController
     elsif set_filter? # apply
       prepare_query
     end
-    if request.xhr?
-      table
-    else
-      redirect_to action: "show", id: @query.id
+
+    respond_to do |format|
+      format.turbo_stream do
+        update_via_turbo_stream(component: Widget::Table.new(@query))
+        render turbo_stream: turbo_streams
+      end
+
+      format.html do
+        redirect_to action: "show", id: @query.id
+      end
     end
   end
 
@@ -197,14 +200,20 @@ class CostReportsController < ApplicationController
   # Rename a record and update its publicity. Redirects to the updated record or
   # renders the updated name on XHR
   def rename
-    @query.name = params[:query_name]
+    expected_params = params.expect(query: %i[name is_public])
+    @query.name = expected_params[:name]
     @query.public! if make_query_public?
     @query.save!
     store_query
-    if request.xhr?
-      render plain: @query.name
-    else
-      redirect_to action: "show", id: @query.id
+
+    respond_to do |format|
+      format.turbo_stream do
+        render plain: @query.name
+      end
+
+      format.html do
+        redirect_to action: "show", id: @query.id
+      end
     end
   end
 
@@ -222,9 +231,8 @@ class CostReportsController < ApplicationController
     filter = f_cls.new.tap do |f|
       f.values = JSON.parse(params[:values].tr("'", '"')) if params[:values].present? && params[:values]
     end
-    render_widget Widget::Filters::Option, filter, to: canvas = +"".html_safe
 
-    render html: canvas, layout: !request.xhr?
+    render Widget::Filters::Option.new(filter), layout: !request.xhr?
   end
 
   ##
@@ -586,7 +594,7 @@ class CostReportsController < ApplicationController
   end
 
   def make_query_public?
-    !!params[:query_is_public]
+    params.dig(:query, :is_public).to_i == 1
   end
 
   ##

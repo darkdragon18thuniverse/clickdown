@@ -72,12 +72,7 @@ interface IGroupBys {
 }
 
 interface IControls {
-  attach_settings_callback:(element:JQuery, callback:(response:string) => void) => void;
   clear_query:(e:Event) => void;
-  observe_click:(elementId:string, callback:(e:Event) => void) => void;
-  update_result_table:(response:string) => void;
-  toggle_delete_form:(e:Event) => void;
-  toggle_save_as_form:(e:Event) => void;
 }
 
 interface IRestoreQuery {
@@ -221,28 +216,6 @@ export default class PageController extends Controller {
           return node.getAttribute('raw-data');
         },
       });
-  }
-
-  private flash(string:string, type = 'error') {
-    const options = type === 'error'
-      ? { id: 'errorExplanation', class: 'errorExplanation' }
-      : { id: `flash_${type}`, class: `flash ${type}` };
-
-    jQuery(`#${options.id}`).remove();
-
-    const flashElement = jQuery('<div></div>')
-      .attr('id', options.id)
-      .attr('class', options.class)
-      .attr('tabindex', '0')
-      .attr('role', 'alert')
-      .html(string);
-
-    jQuery('#content').prepend(flashElement);
-    jQuery(`#${options.id}`).focus();
-  }
-
-  private clearFlash() {
-    jQuery('div[id^=flash]').remove();
   }
 
   private fireEvent(element:HTMLElement, event:string) {
@@ -491,7 +464,7 @@ export default class PageController extends Controller {
   }
 
   private setActiveState(selector:string, active:boolean) {
-    const input = document.querySelector(selector) as HTMLElement;
+    const input = document.querySelector<HTMLElement>(selector);
 
     if (!input) {
       return;
@@ -658,127 +631,26 @@ export default class PageController extends Controller {
 
   private initializeControls() {
     this.controls = {
-      attach_settings_callback: (element:JQuery, callback:(response:string) => void) => {
-        this.attachSettingsCallback(element, callback);
-      },
-
-      clear_query: (e:Event) => {
-        e.preventDefault();
+      clear_query: (_e) => {
         this.filters.clear();
         this.groupBys.clear();
       },
-
-      observe_click: (elementId:string, callback:(e:Event) => void) => {
-        const target = document.getElementById(elementId)!;
-        target?.addEventListener('click', callback);
-      },
-
-      update_result_table: (response:string) => {
-        jQuery('#result-table').html(response);
-        this.initTableSorter();
-      },
-
-      toggle_delete_form: (e:Event) => {
-        e.preventDefault();
-        const offset = jQuery('#query-icon-delete').offset()?.left || 0;
-        jQuery('#delete_form').css('left', `${offset}px`).toggle();
-      },
-
-      toggle_save_as_form: (e:Event) => {
-        e.preventDefault();
-        const offset = jQuery('#query-icon-save-as').offset()?.left || 0;
-        jQuery('#save_as_form').css('left', `${offset}px`).toggle();
-      },
     };
 
-    // Bind control events
-    if (jQuery('#query_saved_name').length) {
-      if (jQuery('#query_saved_name').attr('data-is_new')) {
-        if (jQuery('#query-icon-delete').length) {
-          this.controls.observe_click('query-icon-delete', this.controls.toggle_delete_form);
-          this.controls.observe_click('query-icon-delete-cancel', this.controls.toggle_delete_form);
-          jQuery('#delete_form').hide();
-        }
-
-        if (jQuery('#query-breadcrumb-save').length) {
-          this.controls.attach_settings_callback(jQuery('#query-breadcrumb-save'), this.controls.update_result_table);
-        }
-      }
-    }
-
-    this.controls.observe_click('query-icon-save-as', this.controls.toggle_save_as_form);
-    this.controls.observe_click('query-icon-save-as-cancel', this.controls.toggle_save_as_form);
-
-    jQuery('#save_as_form').hide();
-
-    this.controls.attach_settings_callback(jQuery('#query-icon-save-button'), (newLocation:string) => {
-      document.location.href = newLocation;
-    });
-
-    this.controls.attach_settings_callback(jQuery('#query-icon-apply-button'), this.controls.update_result_table);
-
-    this.controls.observe_click('query-link-clear', this.controls.clear_query);
-  }
-
-  private attachSettingsCallback(element:JQuery, callback:(response:string) => void) {
-    if (!element?.length) {
-      return;
-    }
-
-    const failureCallback = (error:unknown) => {
-      jQuery('#result-table').html('');
-      this.defaultFailureCallback(error);
-    };
-
-    element[0].addEventListener('click', (e:Event) => {
-      e.preventDefault();
-      const target = jQuery(e.target as HTMLElement).closest('[data-target]').attr('data-target');
-      this.sendSettingsData(target || '', callback, failureCallback);
-    });
-  }
-
-  private sendSettingsData(targetUrl:string, callback:(_result:string) => void, failureCallback?:(_error:unknown) => void) {
-    const errorCallback = failureCallback || this.defaultFailureCallback;
-    this.clearFlash();
-
-    void post(targetUrl, { body: this.serializeSettingsForm() })
-      .then((response) => {
-        if (response.unprocessableEntity) {
-          return response.text.then((errorText) => { throw new ValidationError(errorText); });
-        }
-        if (!response.ok) {
-          throw new FetchRequestError(response.statusCode);
-        }
-
-        return response.text;
-      })
-      .then(callback)
-      .catch(errorCallback);
-  }
-
-  private serializeSettingsForm() {
     const queryForm = document.querySelector<HTMLFormElement>('#query_form')!;
-    const formData = new FormData(queryForm);
-
-    ['rows', 'columns'].forEach((type) => {
-      Array.from(document.querySelectorAll<HTMLElement>(`#group-by--${type} .group-by--selected-element`))
-        .map((el) => el.dataset.groupBy)
-        .filter((value) => value !== undefined)
-        .forEach((value) => {
-          formData.append(`groups[${type}][]`, value);
-        });
+    queryForm.addEventListener('reset', this.controls.clear_query);
+    queryForm.addEventListener('formdata', ({ formData }) => {
+      // perform custom serialization of our "quirky" group widget
+      ['rows', 'columns'].forEach((type) => {
+        Array.from(queryForm.querySelectorAll<HTMLElement>(`#group-by--${type} .group-by--selected-element`))
+          .map((el) => el.dataset.groupBy)
+          .filter((value) => value !== undefined)
+          .forEach((value) => {
+            formData.append(`groups[${type}][]`, value);
+          });
+      });
     });
-
-    return formData;
   }
-
-  private defaultFailureCallback = (error:unknown) => {
-    if (error instanceof ValidationError) {
-      this.flash(error.message);
-    } else {
-      this.flash(window.I18n.t('js.reporting_engine.label_response_error'));
-    }
-  };
 
   private restoreQuery() {
     this.restoreQueryModule = {
