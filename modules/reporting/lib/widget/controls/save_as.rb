@@ -36,18 +36,16 @@ class Widget::Controls::SaveAs < Widget::Controls
   option :can_save_as_public, default: -> { false }
 
   def render_control
-    concat(
-      render_button(
-        id: "query-icon-save-as",
-        data: { show_dialog_id: DIALOG_ID }
-      ) do |button|
-        button.with_leading_visual_icon(icon: :"op-save")
+    render_button(
+      id: "query-icon-save-as",
+      data: { show_dialog_id: DIALOG_ID }
+    ) do |button|
+      button.with_leading_visual_icon(icon: :"op-save")
 
-        button_text
-      end
-    )
+      button_text
+    end
 
-    concat render_popup
+    render_popup
   end
 
   def render?

@@ -26,28 +26,18 @@
 # See COPYRIGHT and LICENSE files for more details.
 #++
 
-class Widget::ReportingWidget < ViewComponent::Base
+class Widget::ReportingWidget < Phlex::HTML
   extend Dry::Initializer[undefined: false]
-  include Rails.application.routes.url_helpers
-  include ApplicationHelper
+
+  include Phlex::Rails::Helpers::Routes
+  include Phlex::Rails::Helpers::FormWith
+  include Phlex::Rails::Helpers::Request
+
+  # include ApplicationHelper
   include ReportingHelper
   include Redmine::I18n
 
-  def render_widget(widget, *, to: nil, **, &)
-    instance = widget.new(*, **)
-    rendered = instance.render_in(self, &)
-    return rendered unless to
-
-    to << rendered
-    to
-  end
-
-  module RenderWidgetInstanceMethods
-    def render_widget(widget, *, **, &)
-      widget.new(*, **).render_in(self, &)
-    end
+  def primer_form_with(**, &)
+    form_with(**, skip_default_ids: false, builder: Primer::Forms::Builder, &)
   end
 end
-
-ActionView::Base.include Widget::ReportingWidget::RenderWidgetInstanceMethods
-ActionController::Base.include Widget::ReportingWidget::RenderWidgetInstanceMethods

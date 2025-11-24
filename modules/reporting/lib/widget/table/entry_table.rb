@@ -33,16 +33,16 @@ class Widget::Table::EntryTable < Widget::Table
 
   FIELDS = %i[user_id activity_id entity_gid comments logged_by_id project_id].freeze
 
-  def call
+  def view_template
     content_tag :div, class: "generic-table--container -with-footer" do
       content_tag :div, class: "generic-table--results-container" do
         table = content_tag :table, class: "generic-table",
                                     id: "sortable-table",
                                     data: { reporting__page_target: "table" } do
-          concat colgroup
-          concat head
-          concat foot
-          concat body
+          colgroup
+          head
+          foot
+          body
         end
         table
       end
@@ -51,13 +51,13 @@ class Widget::Table::EntryTable < Widget::Table
 
   def colgroup
     content_tag :colgroup do
-      concat content_tag(:col, "")
+      content_tag(:col, "")
       FIELDS.each do
-        concat content_tag(:col, "")
+        content_tag(:col, "")
       end
-      concat content_tag(:col, "")
-      concat content_tag(:col, "")
-      concat content_tag(:col, "")
+      content_tag(:col, "")
+      content_tag(:col, "")
+      content_tag(:col, "")
     end
   end
 
@@ -79,21 +79,21 @@ class Widget::Table::EntryTable < Widget::Table
   def head
     content_tag :thead do
       content_tag :tr do
-        concat head_column_field(:spent_on)
-        concat head_column(I18n.t("label_time")) if with_times_column?
+        head_column_field(:spent_on)
+        head_column(I18n.t("label_time")) if with_times_column?
         FIELDS.map do |field|
-          concat head_column_field(field)
+          head_column_field(field)
         end
-        concat head_column(cost_type.try(:unit_plural) || I18n.t(:units))
-        concat head_column(CostEntry.human_attribute_name(:costs))
+        head_column(cost_type.try(:unit_plural) || I18n.t(:units))
+        head_column(CostEntry.human_attribute_name(:costs))
         hit = false
         @subject.each_direct_result do |result|
           next if hit
 
           if entry_for(result).editable_by? User.current
-            concat content_tag(:th, class: "unsortable") {
+            content_tag(:th, class: "unsortable") do
               content_tag(:div, "", class: "generic-table--empty-header")
-            }
+            end
             hit = true
           end
         end
@@ -106,26 +106,26 @@ class Widget::Table::EntryTable < Widget::Table
       content_tag :tr do
         main_columns = with_times_column? ? 2 : 1
         if show_result(@subject, 0) == show_result(@subject)
-          concat content_tag(:td, "", colspan: FIELDS.size + main_columns + 1)
-          concat content_tag(:td) {
-            concat content_tag(:div,
-                               show_result(@subject),
-                               class: "result generic-table--footer-outer")
-          }
+          content_tag(:td, "", colspan: FIELDS.size + main_columns + 1)
+          content_tag(:td) do
+            content_tag(:div,
+                        show_result(@subject),
+                        class: "result generic-table--footer-outer")
+          end
         else
-          concat content_tag(:td, "", colspan: FIELDS.size + main_columns)
-          concat content_tag(:td) {
-            concat content_tag(:div,
-                               show_result(@subject),
-                               class: "inner generic-table--footer-outer")
-          }
-          concat content_tag(:td) {
-            concat content_tag(:div,
-                               show_result(@subject, 0),
-                               class: "result generic-table--footer-outer")
-          }
+          content_tag(:td, "", colspan: FIELDS.size + main_columns)
+          content_tag(:td) do
+            content_tag(:div,
+                        show_result(@subject),
+                        class: "inner generic-table--footer-outer")
+          end
+          content_tag(:td) do
+            content_tag(:div,
+                        show_result(@subject, 0),
+                        class: "result generic-table--footer-outer")
+          end
         end
-        concat content_tag(:th, "", class: "unsortable")
+        content_tag(:th, "", class: "unsortable")
       end
     end
   end
@@ -141,23 +141,23 @@ class Widget::Table::EntryTable < Widget::Table
       rows = "".html_safe
       @subject.each_direct_result do |result|
         rows << (content_tag(:tr) do
-          concat body_column_field(:spent_on, result)
+          body_column_field(:spent_on, result)
           if with_times_column?
-            concat content_tag :td, spent_on_time_representation(result.start_timestamp, result["units"].to_f),
-                               class: "start_time right",
-                               "raw-data": result.start_timestamp.to_s
+            content_tag :td, spent_on_time_representation(result.start_timestamp, result["units"].to_f),
+                        class: "start_time right",
+                        "raw-data": result.start_timestamp.to_s
           end
           FIELDS.each do |field|
-            concat body_column_field(field, result)
+            body_column_field(field, result)
           end
-          concat content_tag :td, show_result(result, result.fields["cost_type_id"].to_i),
-                             class: "units right",
-                             "raw-data": result.units
-          concat content_tag :td,
-                             show_result(result, 0),
-                             class: "currency right",
-                             "raw-data": result.real_costs
-          concat content_tag :td, icons(result)
+          content_tag :td, show_result(result, result.fields["cost_type_id"].to_i),
+                      class: "units right",
+                      "raw-data": result.units
+          content_tag :td,
+                      show_result(result, 0),
+                      class: "currency right",
+                      "raw-data": result.real_costs
+          content_tag :td, icons(result)
         end)
       end
       rows

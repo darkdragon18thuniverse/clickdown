@@ -29,6 +29,7 @@
 #++
 
 class Widget::Filters::Date < Widget::Filters::Base
+  include Phlex::Rails::Helpers::TextFieldTag
   include AngularHelper
 
   def render_filter # rubocop:disable Metrics/AbcSize

@@ -32,7 +32,7 @@ class Widget::Controls < Widget::Base
   param :subject
   param :form, optional: true
 
-  def call
+  def view_template
     render(Primer::Alpha::StackItem.new) do
       render_control
     end

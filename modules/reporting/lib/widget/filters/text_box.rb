@@ -29,6 +29,8 @@
 #++
 
 class Widget::Filters::TextBox < Widget::Filters::Base
+  include Phlex::Rails::Helpers::TextFieldTag
+
   def render_filter # rubocop:disable Metrics/AbcSize
     label = content_tag :label,
                         "#{h(filter_class.label)} #{I18n.t(:label_filter_value)}",

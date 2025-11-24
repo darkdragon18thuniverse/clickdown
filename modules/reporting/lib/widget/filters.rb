@@ -28,6 +28,10 @@
 
 # rubocop:disable Metrics/AbcSize
 class Widget::Filters < Widget::Base
+  include Phlex::Rails::Helpers::LabelTag
+  include Phlex::Rails::Helpers::OptionsForSelect
+  include Phlex::Rails::Helpers::SelectTag
+
   param :subject, reader: false
 
   attr_reader :engine
@@ -38,7 +42,7 @@ class Widget::Filters < Widget::Base
     @engine = @subject.class
   end
 
-  def call
+  def view_template
     spacer = content_tag :li, "", class: "advanced-filters--spacer hide-when-print"
 
     add_filter = content_tag :li, id: "add_filter_block", class: "advanced-filters--add-filter hide-when-print" do
@@ -54,13 +58,14 @@ class Widget::Filters < Widget::Base
       )
 
       add_filter_value = content_tag :div, class: "advanced-filters--add-filter-value" do
-        select_tag "add_filter_select",
-                   options_for_select([["", ""]] + selectables),
+        select_tag("add_filter_select",
                    class: "advanced-filters--select",
                    data: {
                      action: "reporting--page#addFilter"
                    },
-                   name: nil
+                   name: nil) do
+                     options_for_select([["", ""]] + selectables)
+                   end
       end
 
       add_filter_label + add_filter_value
@@ -103,36 +108,35 @@ class Widget::Filters < Widget::Base
   # rubocop:disable Metrics/PerceivedComplexity
   def render_filter(f_cls, f_inst)
     f = f_inst || f_cls
-    html = "".html_safe
-    render_widget Label, f, to: html
-    render_widget Operators, f, to: html
+    render Label.new(f)
+    render Operators.new(f)
 
     # Handling for custom widgets first
     if f_cls == CostQuery::Filter::ProjectId
-      render_widget Project, f, to: html
+      render Project.new(f)
     elsif user_filter?(f_cls)
-      render_widget User, f, to: html
+      render User.new(f)
     elsif f_cls == CostQuery::Filter::WorkPackageId
-      render_widget WorkPackage, f, to: html
+      render WorkPackage.new(f)
     # Handling of generic widgets
     elsif f_cls.heavy?
-      render_widget Heavy, f, to: html
+      render Heavy.new(f)
     elsif engine::Operator.string_operators.all? { |o| f_cls.available_operators.include? o }
-      render_widget TextBox, f, to: html
+      render TextBox.new(f)
     elsif engine::Operator.time_operators.all? { |o| f_cls.available_operators.include? o }
-      render_widget Date, f, to: html
+      render Date.new(f)
     elsif engine::Operator.integer_operators.all? { |o| f_cls.available_operators.include? o }
       if f_cls.available_values.blank?
-        render_widget TextBox, f, to: html
+        render TextBox.new(f)
       else
-        render_widget MultiValues, f, to: html, lazy: true
+        render MultiValues.new(f, lazy: true)
       end
     elsif f_cls.is_multiple_choice?
-      render_widget MultiChoice, f, to: html
+      render MultiChoice.new(f)
     else
-      render_widget MultiValues, f, to: html, lazy: true
+      render MultiValues.new(f, lazy: true)
     end
-    render_widget RemoveButton, f, to: html
+    render RemoveButton.new(f)
   end
   # rubocop:enable Metrics/PerceivedComplexity
 

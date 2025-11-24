@@ -31,7 +31,7 @@ class Widget::CostTypes < Widget::Base
 
   option :selected_type_id, optional: true
 
-  def call
+  def view_template
     contents
   end
 

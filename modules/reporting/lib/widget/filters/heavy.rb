@@ -52,7 +52,7 @@ class Widget::Filters::Heavy < Widget::Filters::Base
         "data-action": "change->reporting--page#selectValueChanged"
       }
       box = content_tag :select, select_options do
-        render_widget Widget::Filters::Option, filter, content: opts
+        render Widget::Filters::Option.new(filter, content: opts)
       end
       box
     end

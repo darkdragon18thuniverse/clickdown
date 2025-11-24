@@ -44,9 +44,9 @@ class Widget::Table::ReportTable < Widget::Table
     @walker ||= @subject.walker
     @walker.for_final_row do |row, cells|
       content_tag(:th, class: "normal inner left -break-word", scope: "row") do
-        concat show_row(row)
-        concat safe_join(cells)
-        concat content_tag(:td, show_result(row), class: "normal inner right")
+        show_row(row)
+        safe_join(cells)
+        content_tag(:td, show_result(row), class: "normal inner right")
       end
     end
 
@@ -54,9 +54,9 @@ class Widget::Table::ReportTable < Widget::Table
       subrows.flatten!
       unless row.fields.empty?
         subrows[0] = capture do
-          concat content_tag(:th, show_row(row), class: "top left -breakword", rowspan: subrows.size)
-          concat html_safe_gsub(subrows[0], "class='normal", "class='top")
-          concat content_tag(:th, show_result(row), class: "top right", rowspan: subrows.size)
+          content_tag(:th, show_row(row), class: "top left -breakword", rowspan: subrows.size)
+          html_safe_gsub(subrows[0], "class='normal", "class='top")
+          content_tag(:th, show_result(row), class: "top right", rowspan: subrows.size)
         end
       end
       subrows[-1] = html_safe_gsub(subrows.last, "class='normal", "class='bottom")
@@ -73,18 +73,18 @@ class Widget::Table::ReportTable < Widget::Table
   end
   # rubocop:enable Metrics/AbcSize
 
-  def call
+  def view_template
     configure_query
     configure_walker
-    concat "<table class='report'>".html_safe
+    "<table class='report'>".html_safe
     render_thead
     render_tfoot
     render_tbody
-    concat "</table>".html_safe
+    "</table>".html_safe
   end
 
   def render_tbody
-    concat "<tbody>".html_safe
+    "<tbody>".html_safe
     first = true
     odd = true
     walker.body do |line|
@@ -93,10 +93,10 @@ class Widget::Table::ReportTable < Widget::Table
         first = false
       end
       line = mark_penultimate_column(line)
-      concat content_tag(:tr, line, class: odd ? "odd" : "even")
+      content_tag(:tr, line, class: odd ? "odd" : "even")
       odd = !odd
     end
-    concat "</tbody>".html_safe
+    "</tbody>".html_safe
   end
 
   def mark_penultimate_column(line)
@@ -110,9 +110,9 @@ class Widget::Table::ReportTable < Widget::Table
     walker.headers
     return if walker.headers_empty?
 
-    concat "<thead>".html_safe
+    "<thead>".html_safe
     walker.headers do |list, first, first_in_col, last_in_col|
-      concat "<tr>".html_safe if first_in_col
+      "<tr>".html_safe if first_in_col
       if first
         concat(content_tag(:th, "", rowspan: @subject.depth_of(:column), colspan: @subject.depth_of(:row)))
       end
@@ -126,18 +126,18 @@ class Widget::Table::ReportTable < Widget::Table
       if first
         concat(content_tag(:th, "", rowspan: @subject.depth_of(:column), colspan: @subject.depth_of(:row)))
       end
-      concat "</tr>".html_safe if last_in_col
+      "</tr>".html_safe if last_in_col
     end
-    concat "</thead>".html_safe
+    "</thead>".html_safe
   end
 
   def render_tfoot
     return if walker.headers_empty?
 
-    concat "<tfoot>".html_safe
+    "<tfoot>".html_safe
     walker.reverse_headers do |list, first, first_in_col, last_in_col|
       if first_in_col
-        concat "<tr>".html_safe
+        "<tr>".html_safe
         if first
           concat(content_tag(:th, " ", rowspan: @subject.depth_of(:column), colspan: @subject.depth_of(:row), class: "top"))
         end
@@ -159,10 +159,10 @@ class Widget::Table::ReportTable < Widget::Table
             end
           )
         end
-        concat "</tr>".html_safe
+        "</tr>".html_safe
       end
     end
-    concat "</tfoot>".html_safe
+    "</tfoot>".html_safe
   end
   # rubocop:enable Metrics/AbcSize
 end

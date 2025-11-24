@@ -44,13 +44,13 @@ class Widget::Filters::MultiValues < Widget::Filters::Base
         "data-filter-name": filter_class.underscore_name,
         "data-action": "change->reporting--page#selectValueChanged"
       }
-      box_content = "".html_safe
+
       label = label_tag "#{filter_class.underscore_name}_arg_1_val",
                         "#{h(filter_class.label)} #{I18n.t(:label_filter_value)}",
                         class: "sr-only"
 
       box = content_tag :select, select_options, id: "#{filter_class.underscore_name}_select_1" do
-        render_widget Widget::Filters::Option, filter, to: box_content unless @lazy
+        render Widget::Filters::Option.new(filter) unless @lazy
       end
       plus = content_tag :a,
                          href: "#",

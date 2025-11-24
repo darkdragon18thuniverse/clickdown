@@ -45,7 +45,7 @@ class Widget::Controls::QueryName < Widget::Controls
     )
   end
 
-  def call
+  def view_template
     render Primer::Beta::Text.new(**@system_arguments).with_content(@name)
   end
 

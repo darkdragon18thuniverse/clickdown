@@ -39,10 +39,10 @@ See COPYRIGHT and LICENSE files for more details.
 
 <%= render CostReports::IndexPageHeaderComponent.new(query: @query, project: @project) %>
 
-<%= render_widget Widget::Settings, @query, cost_types: @cost_types, selected_type_id: @unit_id %>
+<%= render Widget::Settings.new(@query, cost_types: @cost_types, selected_type_id: @unit_id) %>
 
 <div id="result-table">
-  <%= render_widget Widget::Table, @query %>
+  <%= render Widget::Table.new(@query) %>
 </div>
 <p class="footnote">
   <%= t(:text_costs_are_rounded_note) %>

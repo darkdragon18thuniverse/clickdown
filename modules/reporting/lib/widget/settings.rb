@@ -31,23 +31,42 @@ class Widget::Settings < Widget::Base
   option :cost_types, optional: true
   option :selected_type_id, optional: true
 
-  delegate :allowed_in_report?, to: :controller
+  # delegate :allowed_in_report?, to: :controller
 
-  def call
-    primer_form_with(
-      model: @subject,
-      scope: :query,
-      id: "query_form",
-      url: url_for(action: "index", set_filter: "1"),
-      method: :post
-    ) do |f|
-      content_tag :div, id: "query_form_content" do
-        concat render_filter_settings
-        concat render_group_by_settings
-        concat render_cost_types_settings
-        concat render_controls_settings(f)
+  def allowed_in_report?(...)
+    true # FIXME
+  end
+
+  def view_template
+    h1 do
+      form_with(
+        model: @subject,
+        scope: :query,
+        id: "query_form",
+        url: url_for(action: "index", set_filter: "1"),
+        method: :post
+      ) do |f|
+        f.text_field name: "foo"
+
+        nil
       end
     end
+
+    # form_with(
+    #   model: @subject,
+    #   scope: :query,
+    #   builder: Primer::Forms::Builder,
+    #   id: "query_form",
+    #   url: url_for(action: "index", set_filter: "1"),
+    #   method: :post
+    # ) do |f|
+    #   div(id: "query_form_content") do
+    #     render_filter_settings
+    #     render_group_by_settings
+    #     render_cost_types_settings
+    #     render_controls_settings(f)
+    #   end
+    # end
   end
 
   private
@@ -81,13 +100,13 @@ class Widget::Settings < Widget::Base
         style: "gap: 0.5rem" # override gap: :condensed
       )
     ) do
-      concat render(
+      render(
         Widget::Controls::Apply.new(@subject, form)
       )
-      concat render(
+      render(
         Widget::Controls::Save.new(@subject, form, can_save: allowed_in_report?(:save, @subject, current_user))
       )
-      concat render(
+      render(
         Widget::Controls::SaveAs.new(
           @subject,
           form,
@@ -95,10 +114,10 @@ class Widget::Settings < Widget::Base
           can_save_as_public: allowed_in_report?(:save_as_public, @subject, current_user)
         )
       )
-      concat render(
+      render(
         Widget::Controls::Clear.new(@subject, form)
       )
-      concat render(
+      render(
         Widget::Controls::Delete.new(@subject, form, can_delete: allowed_in_report?(:destroy, @subject, current_user))
       )
     end

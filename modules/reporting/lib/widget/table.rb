@@ -28,7 +28,7 @@
 
 class Widget::Table < Widget::Base
   extend Report::InheritedAttribute
-  include OpTurbo::Streamable
+  # include OpTurbo::Streamable
   include ReportingHelper
 
   delegate :cost_type, :unit_id, to: :controller
@@ -52,17 +52,17 @@ class Widget::Table < Widget::Base
     end
   end
 
-  def call
-    component_wrapper(tag: "turbo-frame") do
-      # concat("<!-- table start -->".html_safe)
-      if @subject.result.count <= 0
-        content_tag(:div, "", class: "generic-table--no-results-container") do
-          content_tag(:i, "", class: "icon-info1") +
-            content_tag(:span, I18n.t(:no_results_title_text), class: "generic-table--no-results-title")
-        end
-      else
-        render_widget(resolve_table, @subject, **@options)
+  def view_template
+    # component_wrapper(tag: "turbo-frame") do
+    comment { "table start" }
+
+    if @subject.result.count <= 0
+      div(class: "generic-table--no-results-container") do
+        i(class: "icon-info1")
+        span(class: "generic-table--no-results-title") { I18n.t(:no_results_title_text) }
       end
+    else
+      render(resolve_table.new(@subject, **@options))
     end
   end
 end

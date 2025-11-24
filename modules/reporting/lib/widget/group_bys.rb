@@ -27,6 +27,8 @@
 #++
 
 class Widget::GroupBys < Widget::Base
+  include Phlex::Rails::Helpers::LabelTag
+
   param :subject, reader: false
 
   attr_reader :engine
@@ -37,7 +39,7 @@ class Widget::GroupBys < Widget::Base
     @engine = @subject.class
   end
 
-  def call
+  def view_template
     content_tag(:div, id: "group-by--area", class: "autoscroll") do
       out = "".html_safe
       out << render_group("columns", @subject.group_bys(:column))
