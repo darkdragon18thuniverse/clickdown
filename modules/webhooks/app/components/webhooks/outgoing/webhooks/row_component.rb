@@ -28,7 +28,7 @@ module ::Webhooks
               .compact
               .uniq
 
-          count = selected_events.count
+          count = selected_events.size
           if count <= 3
             selected_events.join(", ")
           else
@@ -45,14 +45,14 @@ module ::Webhooks
             return "(#{I18n.t(:label_all)})"
           end
 
-          selected = webhook.projects.map(&:name)
-
-          if selected.empty?
+          count = webhook.projects.size
+          case count
+          when 0
             "(#{I18n.t(:label_all)})"
-          elsif selected.size <= 3
+          when 1..3
             webhook.projects.pluck(:name).join(", ")
           else
-            content_tag("span", selected, class: "badge")
+            content_tag("span", count, class: "badge")
           end
         end
 
