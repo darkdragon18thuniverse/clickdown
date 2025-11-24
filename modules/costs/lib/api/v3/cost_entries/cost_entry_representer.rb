@@ -45,7 +45,9 @@ module API
 
         # TODO: DEPRECATED!
         associated_resource :work_package,
-                            skip_render: ->(*) { represented.entity_type != "WorkPackage" }
+                            skip_render: ->(*) { represented.entity_type != "WorkPackage" },
+                            link_property_name: :entity, # to avoid deprecation warnings with cost_entry.work_package
+                            link_getter: :entity_id # to avoid deprecation warnings with cost_entry.work_package_id
 
         property :id, render_nil: true
         property :units, as: :spentUnits

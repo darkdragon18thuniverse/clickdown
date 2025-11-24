@@ -101,6 +101,8 @@ module API
         # TODO: DEPRECATED!
         associated_resource :work_package,
                             skip_render: ->(*) { represented.entity_type != "WorkPackage" },
+                            link_property_name: :entity, # to avoid deprecation warnings with time_entry.work_package
+                            link_getter: :entity_id, # to avoid deprecation warnings with time_entry.work_package_id
                             getter: ->(*) { represented.entity if represented.entity_type == "WorkPackage" },
                             setter: ::API::V3::TimeEntries::EntityRepresenterFactory.create_setter_lambda(:entity)
 
