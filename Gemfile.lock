@@ -1098,6 +1098,12 @@ GEM
     pg (1.6.2-x86_64-darwin)
     pg (1.6.2-x86_64-linux)
     pg (1.6.2-x86_64-linux-musl)
+    phlex (2.3.1)
+      zeitwerk (~> 2.7)
+    phlex-rails (2.3.1)
+      phlex (~> 2.3.0)
+      railties (>= 7.1, < 9)
+      zeitwerk (~> 2.7)
     plaintext (0.3.6)
       activesupport (> 2.2.1)
       nokogiri (~> 1.10, >= 1.10.4)
@@ -1676,6 +1682,7 @@ DEPENDENCIES
   parallel_tests (~> 4.0)
   pdf-inspector (~> 1.2)
   pg (~> 1.6.2)
+  phlex-rails (~> 2.3)
   plaintext (~> 0.3.2)
   prawn (~> 2.4)
   pry-byebug (~> 3.11.0)
@@ -2123,6 +2130,8 @@ CHECKSUMS
   pg (1.6.2-x86_64-darwin) sha256=c441a55723584e2ae41749bf26024d7ffdfe1841b442308ed50cd6b7fda04115
   pg (1.6.2-x86_64-linux) sha256=525f438137f2d1411a1ebcc4208ec35cb526b5a3b285a629355c73208506a8ea
   pg (1.6.2-x86_64-linux-musl) sha256=e5c8668ffeaf7a9c3458a3dcb002dffa6d8ee1fca9ae534ffef861d2b15644ca
+  phlex (2.3.1) sha256=8c0b2d6774f1e5cdb806bd19a9dc9338acd573e61fe8310a89785d5b25756b66
+  phlex-rails (2.3.1) sha256=7ca0e5cb4344b756e566f4ef8a0d29e7ae8987fa2f459734a7f729ec41abfddd
   plaintext (0.3.6) sha256=6ae13dce9f94e26bde4069109455a1d4948ae161e89350db1a9b37667b61f385
   pp (0.6.3) sha256=2951d514450b93ccfeb1df7d021cae0da16e0a7f95ee1e2273719669d0ab9df6
   prawn (2.4.0) sha256=82062744f7126c2d77501da253a154271790254dfa8c309b8e52e79bc5de2abd
