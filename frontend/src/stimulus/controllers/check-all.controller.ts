@@ -74,8 +74,9 @@ export default class CheckAllController extends Controller<HTMLElement> {
   }
 
   /**
+   * Checks all checkboxes in connected checkable outlets.
    *
-   * @param event
+   * @param event - The triggering event
    * @see {@link CheckableController#checkAll}
    */
   checkAll(event:Event) {
@@ -83,8 +84,9 @@ export default class CheckAllController extends Controller<HTMLElement> {
   }
 
   /**
+   * Unchecks all checkboxes in connected checkable outlets.
    *
-   * @param event
+   * @param event - The triggering event
    * @see {@link CheckableController#uncheckAll}
    */
   uncheckAll(event:Event) {
@@ -92,8 +94,9 @@ export default class CheckAllController extends Controller<HTMLElement> {
   }
 
   /**
+   * Toggles all checkboxes in connected checkable outlets.
    *
-   * @param event
+   * @param event - The triggering event
    * @see {@link CheckableController#toggleAll}
    */
   toggleAll(event:Event) {
