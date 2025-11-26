@@ -53,6 +53,56 @@ RSpec.describe OpenIDConnect::Providers::UpdateContract do
         it_behaves_like "contract is valid"
       end
     end
+
+    describe "claims" do
+      let(:provider) { build_stubbed(:oidc_provider, claims:) }
+      let(:claims) { claims_object.to_json }
+      let(:claims_object) { { id_token: { my_claim: { essential: true } } } }
+
+      it_behaves_like "contract is valid"
+
+      context "when claims are empty" do
+        let(:claims) { "" }
+
+        it_behaves_like "contract is valid"
+      end
+
+      context "when a voluntary claim without special needs is requested" do
+        let(:claims_object) { { id_token: { my_claim: nil } } }
+
+        it_behaves_like "contract is valid"
+      end
+
+      context "when an essential claim with specific values is requested" do
+        let(:claims_object) { { id_token: { my_claim: { essential: true, values: %w[a b] } } } }
+
+        it_behaves_like "contract is valid"
+      end
+
+      context "when claims are not JSON" do
+        let(:claims) { "foobar" }
+
+        it_behaves_like "contract is invalid", claims: :not_json
+      end
+
+      context "when claims are not a JSON object" do
+        let(:claims_object) { "a JSON string" }
+
+        it_behaves_like "contract is invalid", claims: :not_json_object
+      end
+
+      context "when claims contain unsupported root key" do
+        let(:claims_object) { { something: { my_claim: nil } } }
+
+        it_behaves_like "contract is invalid", claims: :invalid_claims_keys
+      end
+
+      context "when claims don't contain object at root key" do
+        let(:claims_object) { { id_token: "not allowed to be a string" } }
+
+        it_behaves_like "contract is invalid", claims: :invalid_claims_value
+      end
+    end
   end
 
   context "when non-admin" do

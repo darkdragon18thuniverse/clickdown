@@ -44,6 +44,8 @@ en:
               response_is_not_successful: " responds with %{status}."
               response_is_not_json: " does not return JSON body."
               response_misses_required_attributes: " does not return required attributes. Missing attributes are: %{missing_attributes}."
+          invalid_claims_keys: "contain unsupported attributes: %{invalid}. Supported attributes are: %{supported}."
+          invalid_claims_value: "does not define a JSON object at %{attribute}."
 
   provider:
     delete_warning:

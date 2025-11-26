@@ -32,6 +32,8 @@ module OpenIDConnect
     class BaseContract < ModelContract
       include RequiresAdminGuard
 
+      VALID_CLAIMS_KEYS = %w[id_token userinfo].freeze
+
       def self.model
         OpenIDConnect::Provider
       end
@@ -81,9 +83,25 @@ module OpenIDConnect
       def claims_are_json
         return if claims.blank?
 
-        JSON.parse(claims)
+        parsed = JSON.parse(claims)
+        return errors.add(:claims, :not_json_object) unless parsed.is_a?(Hash)
+
+        validate_claims_json_structure(parsed)
       rescue JSON::ParserError
         errors.add(:claims, :not_json)
+      end
+
+      def validate_claims_json_structure(parsed)
+        invalid_keys = parsed.keys - VALID_CLAIMS_KEYS
+        if invalid_keys.any?
+          return errors.add(:claims,
+                            :invalid_claims_keys,
+                            invalid: invalid_keys.join(", "),
+                            supported: VALID_CLAIMS_KEYS.join(", "))
+        end
+
+        non_object_key, = parsed.find { |_, v| !v.is_a?(Hash) }
+        errors.add(:claims, :invalid_claims_value, attribute: non_object_key) if non_object_key
       end
 
       def group_regexes_parseable
