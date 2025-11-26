@@ -32,7 +32,7 @@ module ::Webhooks
           if count <= 3
             selected_events.join(", ")
           else
-            content_tag("span", count, class: "badge")
+            render(Primer::Beta::Counter.new(count:))
           end
         end
 
@@ -42,17 +42,17 @@ module ::Webhooks
 
         def selected_projects
           if webhook.all_projects?
-            return "(#{I18n.t(:label_all)})"
+            return render(Primer::Beta::Label.new(scheme: :accent)) { I18n.t(:"webhooks.outgoing.form.project_ids.all") }
           end
 
           count = webhook.projects.size
           case count
           when 0
-            "(#{I18n.t(:label_all)})"
+            render(Primer::Beta::Label.new(scheme: :accent)) { I18n.t(:"webhooks.outgoing.form.project_ids.all") }
           when 1..3
             webhook.projects.pluck(:name).join(", ")
           else
-            content_tag("span", count, class: "badge")
+            render(Primer::Beta::Counter.new(count:))
           end
         end
 
