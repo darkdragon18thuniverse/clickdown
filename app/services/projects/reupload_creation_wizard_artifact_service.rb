@@ -35,6 +35,7 @@ module Projects
     include Rails.application.routes.url_helpers
 
     attr_reader :current_user, :work_package
+
     delegate :project, to: :work_package
 
     def initialize(current_user:, work_package:)
@@ -54,14 +55,14 @@ module Projects
 
     def update_artifact
       if store_attachment_locally?
-        add_attachment_locally
+        return add_attachment_locally
       end
 
       if project_storage.nil?
         return ServiceResult.failure(message: I18n.t("projects.wizard.create_artifact_storage_error"))
       end
 
-      upload_artifact_to_storage(service_call)
+      upload_artifact_to_storage
     end
 
     def store_attachment_locally?
@@ -98,12 +99,16 @@ module Projects
         binary: true
       )
 
-      result = work_package.attachments.create(
+      attachment = work_package.attachments.create(
         author: current_user,
         file:
       )
 
-      ServiceResult.new(result:, errors: work_package.errors)
+      if attachment.persisted?
+        ServiceResult.success(result: attachment)
+      else
+        ServiceResult.failure(result: attachment, errors: attachment.errors)
+      end
     end
 
     def create_pdf_export!
