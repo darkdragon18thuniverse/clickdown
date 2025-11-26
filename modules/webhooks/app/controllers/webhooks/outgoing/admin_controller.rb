@@ -14,11 +14,11 @@ module Webhooks
 
       def show; end
 
-      def edit; end
-
       def new
         @webhook = webhook_class.new_default
       end
+
+      def edit; end
 
       def create
         service = ::Webhooks::Outgoing::UpdateWebhookService.new(webhook_class.new_default, current_user:)
@@ -52,6 +52,13 @@ module Webhooks
         end
 
         redirect_to action: :index, status: :see_other
+      end
+
+      def enabled_projects_menu
+        @available_projects = ::Project.pluck(:name, :id)
+        @webhook = params[:webhook_id].present? ? webhook_class.find(params[:webhook_id]) : webhook_class.new_default
+
+        render layout: false
       end
 
       private

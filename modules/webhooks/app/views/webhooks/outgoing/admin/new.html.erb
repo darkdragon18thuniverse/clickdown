@@ -14,13 +14,25 @@
 
 <%= error_messages_for @webhook %>
 
-<%= labelled_tabular_form_for @webhook,
-                              url: { action: :create },
-                              as: "webhook",
-                              html: { class: "form", autocomplete: "off" } do |f| %>
-  <%= render partial: "form", locals: { f: f, webhook: @webhook } %>
-  <p>
-    <%= styled_button_tag t(:button_create), class: "-primary -with-icon icon-checkmark" %>
-    <%= link_to t(:button_cancel), { action: :index }, class: "button -with-icon icon-cancel" %>
-  </p>
+<%=
+  settings_primer_form_with(
+    model: @webhook,
+    url: { action: :create },
+    scope: :webhook
+  ) do |f|
+%>
+  <%=
+    render(
+      Primer::Forms::FormList.new(
+        Webhooks::Outgoing::WebhooksForm.new(f),
+        Webhooks::Outgoing::EnabledEventsForm.new(f),
+        Webhooks::Outgoing::EnabledProjectsForm.new(f),
+        Webhooks::SaveOrCancel.new(
+          f,
+          submit_label: I18n.t(:button_create),
+          cancel_path: url_for(action: :index)
+        )
+      )
+    )
+  %>
 <% end %>

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#-- copyright
+# -- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) the OpenProject GmbH
 #
@@ -26,16 +26,46 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 # See COPYRIGHT and LICENSE files for more details.
-#++
+# ++
+#
 
-# Be sure to restart your server when you modify this file.
+module Webhooks
+  module Outgoing
+    class EnabledEventsForm < ApplicationForm
+      delegate :event_names, to: :model
 
-# Add new mime types for use in respond_to blocks:
-# Mime::Type.register "text/richtext", :rtf
-# Mime::Type.register_alias "text/html", :iphone
+      form do |f|
+        # Primer, unlike Rails' check_box helper, does not render this auxilary hidden field for us.
+        f.hidden name: "webhook[events][]", value: "", scope_name_to_model: false
 
-Mime::SET << Mime[:csv] unless Mime::SET.include?(Mime[:csv])
+        f.check_box_group(
+          name: :events,
+          label: I18n.t(:"webhooks.outgoing.form.events.title"),
+          data: { controller: "checkable" },
+          id: "enabled_events_fieldset"
+        ) do |group|
+          available_events.each do |label, value|
+            group.check_box(
+              label:,
+              value:,
+              checked: event_names.include?(value),
+              data: { checkable_target: "checkbox" }
+            )
+          end
+        end
+      end
 
-Mime::Type.register "application/pdf", :pdf unless Mime::Type.lookup_by_extension(:pdf)
-Mime::Type.register "image/png", :png unless Mime::Type.lookup_by_extension(:png)
-Mime::Type.register "text/fragment+html", :html_fragment
+      private
+
+      def available_events
+        OpenProject::Webhooks::EventResources
+          .available_events_map
+          .flat_map do |resource_label, events|
+          events.map do |key, label|
+            ["#{resource_label}: #{label}", key]
+          end
+        end
+      end
+    end
+  end
+end

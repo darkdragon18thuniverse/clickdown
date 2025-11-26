@@ -36,7 +36,9 @@ Rails.application.routes.draw do
       resources :webhooks,
                 param: :webhook_id,
                 controller: "webhooks/outgoing/admin",
-                as: "admin_outgoing_webhooks"
+                as: "admin_outgoing_webhooks" do
+                  get :enabled_projects_menu, on: :collection
+                end
     end
   end
 end

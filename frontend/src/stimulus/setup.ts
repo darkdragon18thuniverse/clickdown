@@ -34,6 +34,7 @@ import { Application } from '@hotwired/stimulus';
 import { BeforeunloadController } from './controllers/beforeunload.controller';
 import ExternalLinksController from './controllers/external-links.controller';
 import DisableWhenClickedController from 'core-stimulus/controllers/disable-when-clicked.controller';
+import DisableWhenValueSelectedController from 'core-stimulus/controllers/disable-when-value-selected.controller';
 import HighlightTargetElementController from 'core-stimulus/controllers/highlight-target-element.controller';
 import SelectAutosizeController from 'core-stimulus/controllers/select-autosize.controller';
 import OpZenModeController from 'core-stimulus/controllers/zen-mode.controller';
@@ -50,6 +51,7 @@ OpenProjectStimulusApplication.preregister('application', OpApplicationControlle
 OpenProjectStimulusApplication.preregister('async-dialog', AsyncDialogController);
 OpenProjectStimulusApplication.preregister('disable-when-checked', OpDisableWhenCheckedController);
 OpenProjectStimulusApplication.preregister('disable-when-clicked', DisableWhenClickedController);
+OpenProjectStimulusApplication.preregister('disable-when-value-selected', DisableWhenValueSelectedController);
 OpenProjectStimulusApplication.preregister('flash', FlashController);
 OpenProjectStimulusApplication.preregister('menus--main', MainMenuController);
 OpenProjectStimulusApplication.preregister('password-confirmation-dialog', PasswordConfirmationDialogController);

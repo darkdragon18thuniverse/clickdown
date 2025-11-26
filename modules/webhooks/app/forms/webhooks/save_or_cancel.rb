@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#-- copyright
+# -- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) the OpenProject GmbH
 #
@@ -26,16 +26,33 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 # See COPYRIGHT and LICENSE files for more details.
-#++
+# ++
+#
 
-# Be sure to restart your server when you modify this file.
+module Webhooks
+  class SaveOrCancel < ApplicationForm
+    extend Dry::Initializer
 
-# Add new mime types for use in respond_to blocks:
-# Mime::Type.register "text/richtext", :rtf
-# Mime::Type.register_alias "text/html", :iphone
+    option :submit_label, default: -> { I18n.t(:button_save) }
+    option :cancel_path
 
-Mime::SET << Mime[:csv] unless Mime::SET.include?(Mime[:csv])
+    form do |f|
+      f.group(layout: :horizontal) do |button_group|
+        button_group.submit(
+          name: :submit,
+          label: submit_label,
+          scheme: :primary
+        ) do |button|
+          button.with_leading_visual_icon(icon: :check)
+        end
 
-Mime::Type.register "application/pdf", :pdf unless Mime::Type.lookup_by_extension(:pdf)
-Mime::Type.register "image/png", :png unless Mime::Type.lookup_by_extension(:png)
-Mime::Type.register "text/fragment+html", :html_fragment
+        button_group.button(
+          name: :cancel,
+          label: I18n.t(:button_cancel),
+          tag: :a,
+          href: cancel_path
+        )
+      end
+    end
+  end
+end

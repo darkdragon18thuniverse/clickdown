@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-#-- copyright
+# -- copyright
 # OpenProject is an open source project management software.
 # Copyright (C) the OpenProject GmbH
 #
@@ -26,16 +26,44 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #
 # See COPYRIGHT and LICENSE files for more details.
-#++
+# ++
+#
 
-# Be sure to restart your server when you modify this file.
+module Webhooks
+  module Outgoing
+    class WebhooksForm < ApplicationForm
+      form do |f|
+        f.text_field(
+          name: :name,
+          label: attribute_name(:name),
+          required: true,
+          input_width: :medium
+        )
 
-# Add new mime types for use in respond_to blocks:
-# Mime::Type.register "text/richtext", :rtf
-# Mime::Type.register_alias "text/html", :iphone
+        f.text_field(
+          name: :url,
+          type: :url,
+          label: attribute_name(:url),
+          required: true,
+          input_width: :large,
+          autocomplete: "off"
+        )
 
-Mime::SET << Mime[:csv] unless Mime::SET.include?(Mime[:csv])
+        f.text_area(
+          name: :description,
+          label: attribute_name(:description),
+          placeholder: I18n.t("webhooks.outgoing.form.description.placeholder"),
+          input_width: :large,
+          rows: 3
+        )
 
-Mime::Type.register "application/pdf", :pdf unless Mime::Type.lookup_by_extension(:pdf)
-Mime::Type.register "image/png", :png unless Mime::Type.lookup_by_extension(:png)
-Mime::Type.register "text/fragment+html", :html_fragment
+        f.text_field(
+          name: :secret,
+          label: attribute_name(:secret),
+          caption: I18n.t("webhooks.outgoing.form.secret.description"),
+          input_width: :large
+        )
+      end
+    end
+  end
+end

@@ -1,0 +1,24 @@
+
+<% unless @available_projects.empty? %>
+  <%=
+    render(
+      Primer::Alpha::SelectPanel::ItemList.new(
+        select_variant: (params[:select_variant] || :multiple).to_sym,
+        aria: {
+          label: "options"
+        }
+      )
+    ) do |list|
+  %>
+    <% @available_projects.each do |label, value| %>
+      <%
+        list.with_item(
+          content_arguments: { data: { value: } },
+          active: (params[:selected_project_ids] || []).include?(value.to_s)
+        ) do |item|
+      %>
+        <%= label %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

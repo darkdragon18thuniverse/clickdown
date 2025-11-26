@@ -29,6 +29,38 @@
 export const getNodeIndex = (element:Element) => Array.from(element.parentNode!.children).indexOf(element);
 
 /**
+ * Toggles whether an HTMLInputElement or HTMLFieldSetElement is enabled using `disabled` property.
+ *
+ * @param element the element to be toggled.
+ * @param value force enabled (optional): `true` to enable the element/`false` to disable the element.
+ */
+export function toggleEnabled(element:HTMLElement, value?:boolean) {
+  if (
+    element instanceof HTMLInputElement ||
+    element instanceof HTMLSelectElement ||
+    element instanceof HTMLTextAreaElement ||
+    element instanceof HTMLButtonElement ||
+    element instanceof HTMLFieldSetElement
+  ) {
+    if (typeof value === 'undefined') {
+      element.disabled = !element.disabled;
+    } else {
+      element.disabled = !value;
+    }
+  }
+
+  if (element instanceof HTMLFieldSetElement) {
+    Array.from(element.elements).forEach((child) => {
+      toggleEnabled(child as HTMLElement, !element.disabled);
+    });
+  }
+}
+
+export const enableElement = (element:HTMLElement) => toggleEnabled(element, true);
+
+export const disableElement = (element:HTMLElement) => toggleEnabled(element, false);
+
+/**
  * Toggles the visibility of an HTMLElement using `hidden` property.
  *
  * @note This is the recommended, modern approach. It is also accessible.

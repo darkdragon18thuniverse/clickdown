@@ -31,7 +31,7 @@ RSpec.describe "Manage webhooks through UI", :js, :selenium do
       fill_in "webhook_url", with: "http://example.org"
 
       # Check one event
-      find('.form--check-box[value="work_package:created"]').set true
+      check "Work packages: Created", fieldset: "Enabled events"
 
       # Create
       click_on "Create"
@@ -57,14 +57,23 @@ RSpec.describe "Manage webhooks through UI", :js, :selenium do
 
       SeleniumHubWaiter.wait
       # Check the other event
-      find('.form--check-box[value="work_package:created"]').set false
-      find('.form--check-box[value="work_package:updated"]').set true
+      uncheck "Work packages: Created", fieldset: "Enabled events"
+      check "Work packages: Updated", fieldset: "Enabled events"
 
       # Check a subset of projects
-      choose "webhook_project_ids_selection"
-      find(".webhooks--selected-project-ids[value='#{project.id}']").set true
+      choose "Selected projects only", fieldset: "Enabled projects"
+      click_on accessible_description: "Selected projects"
+
+      within_dialog "Select projects" do |dialog|
+        expect(dialog).to have_button project.name, role: "option", aria: { checked: false }
+
+        click_on project.name, role: "option"
+
+        click_on accessible_name: "Close"
+      end
 
       click_on "Save"
+
       expect_flash(message: I18n.t(:notice_successful_update))
       expect(page).to have_css(".webhooks--outgoing-webhook-row .name", text: "My webhook")
       webhook = Webhooks::Webhook.last
