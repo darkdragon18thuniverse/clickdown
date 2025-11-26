@@ -78,7 +78,7 @@ RSpec.describe "Types", :js do
     from_id = existing_workflow.old_status_id
     to_id = existing_workflow.new_status_id
 
-    checkbox = page.find("input.old-status-#{from_id}.new-status-#{to_id}[value=always]")
+    checkbox = page.find("input[data-old-status=\"#{from_id}\"][data-new-status=\"#{to_id}\"][value=always]")
 
     expect(checkbox).to be_checked
 
