@@ -75,6 +75,10 @@ module Primer
             add_input WorkPackageAutocompleterInput.new(builder:, form:, **decorate_options(**), &)
           end
 
+          def select_panel(**, &)
+            add_input SelectPanelInput.new(builder:, form:, **decorate_options(**), &)
+          end
+
           def decorate_options(include_help_text: true, help_text_options: {}, **options)
             if include_help_text && supports_help_texts?(form.model)
               attribute_name = help_text_options[:attribute_name] || options[:name]
