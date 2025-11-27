@@ -106,30 +106,9 @@ RSpec.describe Portfolios::DetailsComponent, type: :component do
       end
     end
 
-    context "when there are no child portfolios" do
-      describe "displays the number of child programs and projects" do
-        it { expect(subject).to have_text("2 programs") }
-        it { expect(subject).to have_text("5 projects") }
-
-        it { expect(subject).to have_no_text("0 portfolios") }
-      end
-    end
-
-    context "when there are child portfolios" do
-      before do
-        create(:portfolio, parent: portfolio).tap do |child_portfolio|
-          create(:program, parent: child_portfolio)
-        end
-
-        portfolio.reload
-      end
-
-      describe "displays the number of child programs and projects, including portfolios" do
-        it { expect(subject).to have_text("3 programs") }
-        it { expect(subject).to have_text("5 projects") }
-
-        it { expect(subject).to have_text("1 portfolio") }
-      end
+    describe "displays the number of child programs and projects" do
+      it { expect(subject).to have_text("2 programs") }
+      it { expect(subject).to have_text("5 projects") }
     end
 
     describe "portfolio status" do
@@ -187,14 +166,13 @@ RSpec.describe Portfolios::DetailsComponent, type: :component do
 
     it { expect(subject).to have_no_text("2 programs") }
     it { expect(subject).to have_no_text("5 projects") }
-    it { expect(subject).to have_no_text("0 portfolios") }
 
     it "renders the title as text" do
       expect(subject).to have_no_css(".portfolio-name.Link")
       expect(subject).to have_css(".portfolio-name", text: "#{portfolio.name} (Archived)")
     end
 
-    it "has to button to favor the portfolio" do
+    it "has a button to favor the portfolio" do
       expect(subject).not_to have_test_selector("op-portfolios--favorite-button")
     end
 

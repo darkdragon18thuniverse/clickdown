@@ -55,11 +55,6 @@ RSpec.describe "Portfolios", "index", :js, with_ee: :portfolio_management do # T
       create(:project, parent: program_a, status_code: "on_track")
     end
 
-    create(:portfolio, parent: portfolio_b, status_code: "discontinued").tap do |portfolio_b_child|
-      create(:project, parent: portfolio_b_child, status_code: "not_started")
-      create(:project, parent: portfolio_b_child)
-    end
-
     portfolios_page.visit!
   end
 
@@ -77,7 +72,6 @@ RSpec.describe "Portfolios", "index", :js, with_ee: :portfolio_management do # T
 
         expect(page).to have_text("2 projects")
         expect(page).to have_text("1 program")
-        expect(page).to have_no_text("0 portfolios")
       end
     end
 
@@ -141,7 +135,6 @@ RSpec.describe "Portfolios", "index", :js, with_ee: :portfolio_management do # T
         expect(page).to have_no_test_selector("op-portfolios--favorite-button")
         expect(page).to have_no_test_selector("op-portfolios--sub-status-bar")
         expect(page).to have_no_test_selector("op-portfolios--status")
-        expect(page).to have_no_text("0 portfolios")
         expect(page).to have_no_text("0 projects")
         expect(page).to have_no_text("0 programs")
       end
@@ -197,21 +190,6 @@ RSpec.describe "Portfolios", "index", :js, with_ee: :portfolio_management do # T
           page.find_test_selector("op-portfolios--sub-status-bar").hover
           portfolios_page.expect_hover_card(portfolio_a, text: /3\ssub-items\s2\sOn track\s1\sAt risk/)
         end
-
-        # Portfolio B has a child portfolio of its own:
-        portfolios_page.within_row(portfolio_b) do
-          expect(page).to have_text("1 portfolio")
-          expect(page).to have_text("0 programs")
-          expect(page).to have_text("2 projects")
-
-          expect(page).to have_test_selector("op-portfolios--sub-status-bar")
-        end
-
-        # Status of the child portfolio
-        portfolios_page.expect_status_bar_percentage(portfolio_b, "discontinued", "33.3")
-        # Status of a child project
-        portfolios_page.expect_status_bar_percentage(portfolio_b, "not_started", "33.3")
-        portfolios_page.expect_status_bar_percentage(portfolio_b, "not_set", "33.3")
       end
 
       it "does show an empty status bar if no sub-item has a status" do

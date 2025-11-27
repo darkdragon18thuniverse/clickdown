@@ -56,14 +56,6 @@ module Portfolios
       @currently_favorited ||= portfolio.favorited?
     end
 
-    def has_subportfolios?
-      all_subportfolios.present?
-    end
-
-    def all_subportfolios
-      all_descendants.portfolio
-    end
-
     def all_subprograms
       all_descendants.program
     end
@@ -104,7 +96,10 @@ module Portfolios
     private
 
     def all_descendants
-      @all_descendants ||= portfolio.descendants.visible
+      @all_descendants ||= portfolio
+                             .descendants
+                             .where(workspace_type: %w[project program])
+                             .visible
     end
 
     def sub_statuses

@@ -99,26 +99,6 @@
             )
           end
 
-          if has_subportfolios?
-            footer.with_column(mr: 3) do
-              concat(
-                render(
-                  Primer::Beta::Octicon.new(
-                    icon: workspace_icon("portfolio"),
-                    align_self: :center,
-                    "aria-label": t("portfolio.count", count: all_subportfolios.count),
-                    mr: 1
-                  )
-                )
-              )
-              concat(
-                render(Primer::Beta::Text.new) do
-                  t("portfolio.count", count: all_subportfolios.count)
-                end
-              )
-            end
-          end
-
           footer.with_column(mr: 3) do
             concat(
               render(
