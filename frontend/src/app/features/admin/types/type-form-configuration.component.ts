@@ -35,6 +35,7 @@ export const emptyTypeGroup = '__empty';
   templateUrl: './type-form-configuration.html',
   providers: [
     TypeBannerService,
+    DragulaService
   ],
   standalone: false,
 })
