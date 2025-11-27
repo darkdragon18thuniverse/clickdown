@@ -34,9 +34,10 @@ RSpec.describe "Projects", "editing settings", :js do
   include_context "ng-select-autocomplete helpers"
 
   let(:permissions) { %i(edit_project view_project_attributes edit_project_attributes) }
+  let(:project_memberships) { { project => permissions } }
 
   current_user do
-    create(:user, member_with_permissions: { project => permissions })
+    create(:user, member_with_permissions: project_memberships)
   end
 
   shared_let(:project) do
@@ -289,6 +290,32 @@ RSpec.describe "Projects", "editing settings", :js do
         end
         expect(page).to have_no_modal "Description"
       end
+    end
+  end
+
+  describe "workspace type badges in Subproject of field", with_flag: { portfolio_models: true } do
+    shared_let(:portfolio) { create(:portfolio, name: "Parent Portfolio") }
+    shared_let(:program) { create(:program, name: "Parent Program") }
+    shared_let(:regular_project) { create(:project, name: "Regular Project") }
+    let(:parent_permissions) { %i[add_subprojects] }
+
+    let(:project_memberships) do
+      { project => permissions,
+        portfolio => parent_permissions,
+        program => parent_permissions,
+        regular_project => parent_permissions }
+    end
+
+    it "displays workspace type badges for portfolios and programs" do
+      general_page = Pages::Projects::Settings::General.new(project)
+      general_page.visit!
+
+      parent_field = general_page.parent_project_field
+
+      # Verify badges for different project types
+      parent_field.expect_option("Parent Portfolio", workspace_badge: "Portfolio")
+      parent_field.expect_option("Parent Program", workspace_badge: "Program")
+      parent_field.expect_option("Regular Project")
     end
   end
 end

@@ -78,6 +78,12 @@ module Pages
         def find_field_label(label_text)
           page.find(:element, :label, text: label_text)
         end
+
+        def parent_project_field
+          @parent_project_field ||= within_section "Project relations" do
+            ProjectEditField.new(page, :parent, selector: "opce-project-autocompleter")
+          end
+        end
       end
     end
   end

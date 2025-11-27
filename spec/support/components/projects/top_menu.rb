@@ -95,6 +95,12 @@ module Components
         page.find autocompleter_results_selector, wait: 10
       end
 
+      def within_item(project, &)
+        within search_results do
+          within "[data-project-id='#{project.id}']", &
+        end
+      end
+
       def autocompleter
         page.find autocompleter_selector, wait: 10
       end
