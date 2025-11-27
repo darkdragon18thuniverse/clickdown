@@ -4,7 +4,16 @@
   let-clear="clear"
   >
   <span class="ng-value-icon left" (click)="clear(item)">×</span>
-  <span class="ng-value-label">{{ item.name }}</span>
+  <span class="ng-value-label" style="display: flex; gap: 0.5rem;">
+    <span class="ellipsis">{{ item.name }}</span>
+    @if (shouldShowWorkspaceTypeBadge(item)) {
+      <span
+        class="color-fg-muted"
+        [innerHTML]="workspaceTypeIconWithLabel(item)"
+        style="flex-shrink: 0;"
+      ></span>
+    }
+  </span>
 </ng-template>
 
 <ng-template
