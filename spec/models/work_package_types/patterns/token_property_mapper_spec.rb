@@ -133,7 +133,7 @@ RSpec.describe WorkPackageTypes::Patterns::TokenPropertyMapper do
       expect(token.call(work_package)).to eq("false")
     end
 
-    it "formats date custom fields correctly" do
+    it "formats date custom fields with a default format" do
       enabled, = subject
       token = enabled.detect do |t|
         t.key == :"custom_field_#{date_custom_field.id}"
@@ -174,6 +174,17 @@ RSpec.describe WorkPackageTypes::Patterns::TokenPropertyMapper do
       enabled, disabled = subject
       expect(detect(enabled, :"custom_field_#{cf.id}")).to be_nil
       expect(detect(disabled, :"custom_field_#{cf.id}")&.label).to eq(cf.name)
+    end
+
+    context "when defining an instance date format", with_settings: { date_format: "%d.%m.%Y" } do
+      it "formats date custom fields according to the instance date format" do
+        enabled, = subject
+        token = enabled.detect do |t|
+          t.key == :"custom_field_#{date_custom_field.id}"
+        end
+
+        expect(token.call(work_package)).to eq("03.10.2025")
+      end
     end
   end
 

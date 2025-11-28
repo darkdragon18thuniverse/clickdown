@@ -33,7 +33,7 @@ module WorkPackageTypes
     class TokenPropertyMapper
       STRING_OR_NIL = ->(v) { v&.to_s }
       ARRAY = ->(v) { v.compact.presence&.join(", ") }
-      DATE = ->(v) { v&.strftime("%Y-%m-%d") }
+      DATE = ->(v) { v&.strftime(Setting.date_format || "%Y-%m-%d") }
       DURATION = ->(v) { DurationConverter.output(v) }
 
       class << self
@@ -120,11 +120,13 @@ module WorkPackageTypes
       end
 
       def tokenize(custom_field_scope, prefix = nil)
-        custom_field_scope.pluck(:name, :id, :multi_value).map do |name, id, multiple|
+        custom_field_scope.pluck(:name, :id, :field_format, :multi_value).map do |name, id, format, multiple|
           formatter = if multiple
                         ARRAY
+                      elsif format == "date"
+                        DATE
                       else
-                        ->(v) { v.is_a?(Symbol) ? v : v&.to_s }
+                        ->(v) { v.is_a?(Symbol) ? v : STRING_OR_NIL.call(v) }
                       end
           AttributeToken.new(
             :"#{prefix}custom_field_#{id}",
