@@ -1,4 +1,7 @@
 <div role="search" class="top-menu-search" [attr.aria-label]="placeholder">
+  <div aria-live="polite" class="sr-only">
+    {{ liveMessage }}
+  </div>
 
   @if (expanded) {
     <button
@@ -21,6 +24,7 @@
     [attr.aria-label]="text.search"
     [class.-input-focused]="expanded"
     (click)="handleClick($event)"
+    tabindex="-1"
     >
     <op-icon icon-classes="icon5 icon-search ellipsis" />
   </button>
@@ -30,6 +34,7 @@
     [name]="'global-search-input'"
     [id]="'global-search-input'"
     [accesskey]="4"
+    [markFirst]="false"
     class="global-search"
     [placeholder]="effectivePlaceholder"
     [ariaLabel]="effectivePlaceholder"
@@ -38,6 +43,7 @@
     [inputAttrs]="{ 'class': 'global-search--input', 'name': 'global-search--input', autocomplete: 'off'}"
     [openOnEnter]="true"
     [labelRequired]="false"
+    [clearAllText]="text.close_search"
     [focusDirectly]="isFocusedDirectly"
     [model]="selectedItem"
     [searchFn]="customSearchFn"

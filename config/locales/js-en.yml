@@ -1197,6 +1197,7 @@ en:
     global_search:
       all_projects: "In all projects"
       close_search: "Close search"
+      items_available: "%{count} items available"
       current_project_and_all_descendants: "In this project + subprojects"
       current_project: "In this project"
       recently_viewed: "Recently viewed"
