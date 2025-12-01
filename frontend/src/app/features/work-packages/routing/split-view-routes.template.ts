@@ -115,8 +115,7 @@ export function makeSplitViewRoutes(baseRoute:string,
         bodyClasses: 'router--work-packages-partitioned-split-view-new',
         // Remember the base route so we can route back to it anywhere
         baseRoute,
-        parent: baseRoute,
-        mobileAlternative: showMobileAlternative ? 'work-packages.new' : undefined,
+        parent: baseRoute
       },
       views: {
         // Retarget and by that override the grandparent views

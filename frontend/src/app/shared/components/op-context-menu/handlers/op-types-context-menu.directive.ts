@@ -42,6 +42,7 @@ import { TypeResource } from 'core-app/features/hal/resources/type-resource';
 import { PathHelperService } from 'core-app/core/path-helper/path-helper.service';
 import { CurrentProjectService } from 'core-app/core/current-project/current-project.service';
 import { extendSearchParams } from 'core-stimulus/helpers/url-helpers';
+import { BrowserDetector } from 'core-app/core/browser/browser-detector.service';
 
 @Directive({
   selector: '[opTypesCreateDropdown]',
@@ -65,6 +66,7 @@ export class OpTypesContextMenuDirective extends OpContextMenuTrigger implements
     readonly $state:StateService,
     readonly pathHelper:PathHelperService,
     readonly currentProject:CurrentProjectService,
+    readonly browser:BrowserDetector,
   ) {
     super(elementRef, opContextMenu);
   }
@@ -113,7 +115,7 @@ export class OpTypesContextMenuDirective extends OpContextMenuTrigger implements
       ariaLabel: type.name,
       class: Highlighting.inlineClass('type', type.id!),
       onClick: (event:MouseEvent) => {
-        if (this.routedFromAngular) {
+        if (this.routedFromAngular && !this.browser.isMobile) {
           this.isOpen = false;
           if (isClickedWithModifier(event)) {
             return false;
