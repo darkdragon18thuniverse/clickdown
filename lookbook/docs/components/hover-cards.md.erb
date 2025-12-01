@@ -62,8 +62,6 @@ The content of a hover card can be defined in two ways:
 2. Via an existing DOM element that is present (but hidden) in the document on page load. This is useful when the
    content is already present and no additional fetching is necessary.
 
-Essentially the `HoverCard` is just a div which renders inside a `turboFrame`.
-
 ### Asynchronous hover cards via turbo frame
 
 The element that defines the trigger (via `data-hover-card-trigger-target="trigger"`) must provide an attribute
@@ -135,20 +133,28 @@ trigger element.
 The hover card content can be placed at a convenient place in the DOM. The following attributes must be set on the
 element to ensure it will be displayed correctly:
 
-1. `op-hover-card` class.
-2. A `popover` attribute set to `auto`.
-3. The ID that was inserted in the trigger's `data-hover-card-popover-id` attribute.
+1. The ID that was inserted in the trigger's `data-hover-card-popover-id` attribute.
+2. The element from 1 should be placed into a container that is hidden. You *can* use the
+   class `op-hover-card--hidden-container` for that or define your own CSS to hide the container.
 
 On page load, the hover card will be hidden automatically. When hovering over the trigger, the hover card will be
 shown next to it.
 
+Please note that the hover card "blueprint" provided in the DOM will be cloned and moved into another location as part
+of displaying the card. The cloned elements ID will be removed to avoid duplicate IDs in the DOM.
+
+This is to say: do not apply logic or styling that depends on the ID of the hover card element itself, as the ID
+will remain with the hidden original element.
+
 **Card content**:
 ```html
-  <!-- Somewhere else in the DOM -->
-  <div class="op-hover-card"
-       id="work-package-hover-card-14"
-       popover="auto">
+  <!-- Somewhere else in the DOM... -->
 
-    <p>Description text of work package 14!</p>
+  <!-- Hidden container, so that the popover is hidden on page load -->
+  <div class="op-hover-card--hidden-container">
+    <!-- Actual hover card contents that will be rendered in a popover. Note the ID: -->
+    <div id="work-package-hover-card-14" class="your-styling-classes">
+      <p>Hover card with description text of work package 14!</p>
+    </div>
   </div>
 ```
