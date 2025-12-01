@@ -161,7 +161,7 @@
     "ng-dynamic-component": "^10.7.0",
     "ng2-charts": "^8.0.0",
     "ng2-dragula": "^6.0.0",
-    "ngx-cookie-service": "^20.1.1",
+    "ngx-cookie-service": "^21.1.0",
     "observable-array": "0.0.4",
     "op-blocknote-extensions": "https://github.com/opf/op-blocknote-extensions/releases/download/v0.0.14/op-blocknote-extensions-0.0.14.tgz",
     "pako": "^2.0.3",
