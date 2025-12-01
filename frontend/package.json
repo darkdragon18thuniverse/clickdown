@@ -102,7 +102,7 @@
     "@hotwired/stimulus": "^3.2.2",
     "@hotwired/turbo": "^8.0.20",
     "@hotwired/turbo-rails": "^8.0.20",
-    "@knowledgecode/delegate": "^0.8.5",
+    "@knowledgecode/delegate": "^0.9.0",
     "@kolkov/ngx-gallery": "^2.0.1",
     "@mantine/core": "^8.3.7",
     "@mantine/hooks": "^8.3.6",
