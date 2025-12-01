@@ -212,7 +212,7 @@ RSpec.describe "Upload attachment to documents",
     end
   end
 
-  context "for collaborative documents", with_flag: { block_note_editor: true } do
+  context "for collaborative documents" do
     let(:document) { create(:document, project:) }
     let(:editor) { FormFields::Primerized::BlockNoteEditorInput.new }
     let(:attachments_list) { Components::AttachmentsList.new }

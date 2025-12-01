@@ -68,7 +68,7 @@ module API
             end
 
             patch do
-              unless OpenProject::FeatureDecisions.block_note_editor_active?
+              unless Setting.real_time_text_collaboration_enabled?
                 raise ::API::Errors::Unauthorized.new(message: I18n.t("api_v3.errors.code_403"))
               end
 

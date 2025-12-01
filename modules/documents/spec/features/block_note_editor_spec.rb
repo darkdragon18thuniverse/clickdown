@@ -30,7 +30,7 @@
 
 require "rails_helper"
 
-RSpec.describe "BlockNote editor rendering", :js, with_flag: { block_note_editor: true } do
+RSpec.describe "BlockNote editor rendering", :js do
   let(:admin) { create(:admin) }
   let(:type) { create(:document_type, :experimental) }
   let(:document) { create(:document, type:) }

@@ -51,18 +51,6 @@ class AddCollaborationToDocuments < ActiveRecord::Migration[8.0]
         UPDATE documents
         SET kind = 'classic'
       SQL
-
-      # Reset documents with "Experimental" type to collaborative kind
-      # These were likely created when OPENPROJECT_FEATURE_BLOCK_NOTE_EDITOR was enabled
-      if OpenProject::FeatureDecisions.block_note_editor_active?
-        execute <<~SQL.squish
-          UPDATE documents
-          SET kind = 'collaborative'
-          FROM document_types
-          WHERE documents.type_id = document_types.id
-          AND LOWER(document_types.name) = LOWER('Experimental')
-        SQL
-      end
     end
   end
 

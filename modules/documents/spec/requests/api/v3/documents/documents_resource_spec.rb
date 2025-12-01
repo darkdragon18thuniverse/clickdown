@@ -131,7 +131,7 @@ RSpec.describe "API v3 documents resource" do
     end
   end
 
-  describe "PATCH /api/v3/documents/:id" do
+  describe "PATCH /api/v3/documents/:id", with_settings: { real_time_text_collaboration_enabled: true } do
     let(:path) { api_v3_paths.document(document.id) }
     let(:permissions) { %i(view_documents manage_documents) }
     let(:request_body) do
@@ -145,11 +145,11 @@ RSpec.describe "API v3 documents resource" do
       patch path, request_body.to_json, "CONTENT_TYPE" => "application/json"
     end
 
-    it "returns 200 OK", with_flag: { block_note_editor: true } do
+    it "returns 200 OK" do
       expect(subject.status).to be(200)
     end
 
-    it "updates the document and returns updated document", with_flag: { block_note_editor: true } do
+    it "updates the document and returns updated document" do
       expect(subject.body)
         .to be_json_eql("Document".to_json)
         .at_path("_type")
@@ -163,7 +163,7 @@ RSpec.describe "API v3 documents resource" do
         .at_path("contentBinary")
     end
 
-    context "when lacking edit permissions", with_flag: { block_note_editor: true } do
+    context "when lacking edit permissions" do
       let(:permissions) { %i(view_documents) }
 
       it "returns 403 FORBIDDEN" do
@@ -172,7 +172,7 @@ RSpec.describe "API v3 documents resource" do
       end
     end
 
-    context "when lacking view permissions", with_flag: { block_note_editor: true } do
+    context "when lacking view permissions" do
       let(:permissions) { [] }
 
       it "returns 404 NOT FOUND" do
@@ -181,7 +181,8 @@ RSpec.describe "API v3 documents resource" do
       end
     end
 
-    context "when block note editor feature is not active", with_flag: { block_note_editor: false } do
+    context "when real-time collaboration is disabled",
+            with_settings: { real_time_text_collaboration_enabled: false } do
       before do
         patch path, request_body.to_json, "CONTENT_TYPE" => "application/json"
       end
