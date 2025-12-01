@@ -180,44 +180,48 @@
         end
       end
     end
+  end
+%>
 
-    # Card that appears when hovering over the progress bar
-    if render_sub_status_bar?
-      flex.with_row(classes: "op-portfolios--popover-container") do
-        flex_layout(
-          classes: "op-portfolios--popover op-hover-card",
-          id: sub_status_hover_card_id,
-          popover: :auto,
-          data: {
-            hover_card_trigger_target: "card",
-            test_selector: "op-portfolios--hover-card-#{portfolio.id}"
-          }
-        ) do |popover|
-          popover.with_column(mr: 3) do
-            sub_item_count = sub_statuses_with_percentages.sum { |s| s[:count] }
+<%=
+  # Card that appears when hovering over the progress bar
+  if render_sub_status_bar?
+    content_tag(:div, class: "op-hover-card--hidden-container") do
+      flex_layout do |flex|
+        flex.with_row(classes: "op-portfolios--popover-container") do
+          flex_layout(
+            id: sub_status_hover_card_id,
+            classes: "op-portfolios--popover",
+            data: {
+              test_selector: "op-portfolios--hover-card-#{portfolio.id}"
+            }
+          ) do |popover|
+            popover.with_column(mr: 3) do
+              sub_item_count = sub_statuses_with_percentages.sum { |s| s[:count] }
 
-            render(Primer::Beta::Text.new(color: :muted)) do
-              t("portfolios.index.sub_items_html", count: sub_item_count)
+              render(Primer::Beta::Text.new(color: :muted)) do
+                t("portfolios.index.sub_items_html", count: sub_item_count)
+              end
             end
-          end
 
-          sub_statuses_with_percentages.each do |status|
-            status => { code:, count: }
+            sub_statuses_with_percentages.each do |status|
+              status => { code:, count: }
 
-            status_label = t("js.grid.widgets.project_status.#{code || 'not_set'}")
+              status_label = t("js.grid.widgets.project_status.#{code || 'not_set'}")
 
-            popover.with_column(mr: 3, display: :flex) do
-              concat(content_tag(:span, "", class: "op-bubble op-bubble_mini op-bubble_squared #{helpers.project_status_css_class(code)}"))
-              concat(
-                render(Primer::Beta::Text.new(ml: 2, font_weight: :bold)) do
-                  count.to_s
-                end
-              )
-              concat(
-                render(Primer::Beta::Text.new(ml: 1)) do
-                  " #{status_label}"
-                end
-              )
+              popover.with_column(mr: 3, display: :flex) do
+                concat(content_tag(:span, "", class: "op-bubble op-bubble_mini op-bubble_squared #{helpers.project_status_css_class(code)}"))
+                concat(
+                  render(Primer::Beta::Text.new(ml: 2, font_weight: :bold)) do
+                    count.to_s
+                  end
+                )
+                concat(
+                  render(Primer::Beta::Text.new(ml: 1)) do
+                    " #{status_label}"
+                  end
+                )
+              end
             end
           end
         end

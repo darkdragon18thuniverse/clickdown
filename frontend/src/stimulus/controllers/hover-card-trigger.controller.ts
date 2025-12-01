@@ -51,8 +51,6 @@ export default class HoverCardTriggerController extends ApplicationController {
   private closeTimeout:number|null = null;
   private previousTarget:HTMLElement|null = null;
 
-  private staticPopover:HTMLElement|null = null;
-
   // Track whether we currently show a hover card or not. It is important not to open multiple hover cards at
   // the same time, and refrain from closing the wrong kind of modal overlay.
   private isShowingHoverCard = false;
@@ -168,7 +166,7 @@ export default class HoverCardTriggerController extends ApplicationController {
     if (!this.mouseIsHoveringOverTrigger) { return; }
 
     if (popoverElement) {
-      this.showExistingPopover(el, popoverElement);
+      this.showHoverCardViaExistingElement(el, popoverElement);
     } else {
       this.loadAndShowHoverCardViaTurboFrame(el, turboFrameUrl);
     }
@@ -180,7 +178,7 @@ export default class HoverCardTriggerController extends ApplicationController {
 
     this.moveOverlayToAppropriateParent(overlay, targetEl);
 
-    const { turboFrame, popover } = this.constructPopover(overlay, turboFrameUrl);
+    const { turboFrame, popover } = this.buildPopoverWithTurboFrame(overlay, turboFrameUrl);
 
     this.isShowingHoverCard = true;
     this.previousTarget = targetEl;
@@ -193,10 +191,14 @@ export default class HoverCardTriggerController extends ApplicationController {
     });
   }
 
-  private showExistingPopover(targetEl:HTMLElement, popover:HTMLElement) {
-    this.getAndResetOverlay();
+  private showHoverCardViaExistingElement(targetEl:HTMLElement, protoPopover:HTMLElement) {
+    const overlay = this.getAndResetOverlay();
+    if (!overlay) { return; }
 
-    this.staticPopover = popover;
+    this.moveOverlayToAppropriateParent(overlay, targetEl);
+
+    const popover = this.cloneStaticPopover(overlay, protoPopover);
+
     this.isShowingHoverCard = true;
     this.previousTarget = targetEl;
 
@@ -232,9 +234,6 @@ export default class HoverCardTriggerController extends ApplicationController {
 
     if (this.isShowingHoverCard && !this.mouseInModal) {
       this.getAndResetOverlay();
-
-      this.staticPopover?.hidePopover();
-      this.staticPopover = null;
 
       this.isShowingHoverCard = false;
       // Allow opening this target once more, since it has been orderly closed
@@ -301,11 +300,9 @@ export default class HoverCardTriggerController extends ApplicationController {
     });
   }
 
-  private constructPopover(overlay:HTMLElement, turboFrameUrl:string) {
+  private buildPopoverWithTurboFrame(overlay:HTMLElement, turboFrameUrl:string) {
     const popover = document.createElement('div');
-    popover.className = 'op-hover-card';
-    popover.setAttribute('popover', 'auto');
-    popover.setAttribute('data-hover-card-trigger-target', 'card');
+    this.setPopoverAttributes(popover);
 
     const turboFrame = document.createElement('turbo-frame');
     turboFrame.id = 'op-hover-card-body';
@@ -315,6 +312,23 @@ export default class HoverCardTriggerController extends ApplicationController {
     overlay.appendChild(popover);
 
     return { turboFrame, popover };
+  }
+
+  private cloneStaticPopover(overlay:HTMLElement, staticPopover:HTMLElement):HTMLElement {
+    const popover = staticPopover.cloneNode(true) as HTMLElement;
+
+    popover.removeAttribute('id');
+    this.setPopoverAttributes(popover);
+
+    overlay.appendChild(popover);
+
+    return popover;
+  }
+
+  private setPopoverAttributes(popover:HTMLElement) {
+    popover.classList.add('op-hover-card');
+    popover.setAttribute('popover', 'auto');
+    popover.setAttribute('data-hover-card-trigger-target', 'card');
   }
 
   /*
